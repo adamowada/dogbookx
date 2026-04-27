@@ -2,6 +2,17 @@
 
 DogbookX is a local-first social media MVP for dog owners. It includes a React + Tailwind frontend, an Express API, shared TypeScript types, and a reusable UI package built from the components already present in the repository.
 
+## MVP Features
+
+- Short-post home feed
+- Dog-profile posting identity
+- Create and edit local dog profiles
+- Inline replies with reply counts
+- Likes, reposts, follows, suggestions, groups, and notifications
+- Lightweight moderation checks for posts and replies
+- Durable local JSON persistence for development
+- Session viewer identity stored in browser localStorage
+
 ## Run Locally
 
 ```bash

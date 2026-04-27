@@ -167,7 +167,7 @@ Data tier:
 4. [x] Implement JSON repository persistence.
 5. [x] Add session header support in routes and web API client.
 6. [x] Run validation and fix failures.
-7. [ ] Commit, push, PR to `dev`, review, and merge.
+7. [x] Commit, push, PR to `dev`, review, and merge.
 
 Use this file for planning meaningful DogbookX features, refactors, or architecture changes.
 
@@ -229,7 +229,53 @@ Data tier:
 4. [x] Implement repository/service/routes for dogs and replies.
 5. [x] Add dog profile and reply UI.
 6. [x] Run validation and fix failures.
-7. [ ] Commit, push, PR to `dev`, review, and merge.
+7. [x] Commit, push, PR to `dev`, review, and merge.
+
+# Plan: MVP Release Finalization
+
+## Goal
+
+Promote the integrated DogbookX MVP from `dev` to `main` after verifying the completed local product flow.
+
+## Context
+
+The MVP now includes durable local data, session viewer identity, dog profile management, short posts, replies, likes, reposts, follows, notifications, groups, moderation checks, and a React frontend that can be run locally.
+
+## Scope
+
+In scope:
+
+- Final documentation polish
+- Full validation on integrated `dev`
+- PR from release-finalization branch into `dev`
+- Release PR from `dev` into `main`
+
+Out of scope:
+
+- Production auth
+- Database server migration
+- Hosted deployment
+
+## Test plan
+
+Expected validation commands:
+
+```bash
+npm test
+npm run test:smoke
+npm run test:e2e
+npm run lint
+npm run typecheck
+npm run build
+```
+
+## Implementation steps
+
+1. [x] Mark completed MVP branch plans.
+2. [x] Update README with the final MVP feature set.
+3. [x] Run full validation.
+4. [ ] Commit, push, PR to `dev`, review, and merge.
+5. [ ] Create and merge release PR from `dev` to `main`.
 
 Plans should be clear, practical, and easy to execute. Keep them updated as work progresses.
 
