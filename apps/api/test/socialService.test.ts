@@ -51,4 +51,50 @@ describe('SocialService', () => {
     expect(post.body).toContain('Fresh Bean')
     expect(service.getHomeFeed(viewerId).posts[0]?.id).toBe(post.id)
   })
+
+  it('creates dog profiles for the viewer', () => {
+    const service = new SocialService(createSocialRepository({ dataFile: ':memory:' }))
+
+    const dog = service.createDog({
+      ownerId: viewerId,
+      name: 'Toast',
+      breed: 'Beagle',
+      age: 2,
+      pronouns: 'he/him',
+      bio: 'Snack inspector and window watcher.',
+      favoritePark: 'Forest Park'
+    })
+
+    expect(dog.id).toMatch(/^dog-/)
+    expect(service.getHomeFeed(viewerId).dogs.map((item) => item.name)).toContain('Toast')
+  })
+
+  it('updates only dog profiles owned by the viewer', () => {
+    const service = new SocialService(createSocialRepository({ dataFile: ':memory:' }))
+
+    const updated = service.updateDog('dog-bean', {
+      ownerId: viewerId,
+      favoritePark: 'Peninsula Park'
+    })
+
+    expect(updated.favoritePark).toBe('Peninsula Park')
+    expect(() => service.updateDog('dog-river', { ownerId: viewerId, bio: 'Nope' })).toThrow(/not found/)
+  })
+
+  it('creates replies and enriches recent replies on the feed', () => {
+    const service = new SocialService(createSocialRepository({ dataFile: ':memory:' }))
+
+    const reply = service.createReply({
+      postId: 'post-1',
+      authorId: viewerId,
+      dogId: 'dog-bean',
+      body: 'Bean is cheering for River.'
+    })
+
+    const post = service.getHomeFeed(viewerId).posts.find((item) => item.id === 'post-1')
+
+    expect(reply.body).toContain('cheering')
+    expect(post?.replyCount).toBe(6)
+    expect(post?.recentReplies[0]?.dog?.name).toBe('Bean')
+  })
 })

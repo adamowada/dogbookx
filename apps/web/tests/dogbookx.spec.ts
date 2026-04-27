@@ -7,3 +7,12 @@ test('loads the DogbookX feed and composer', async ({ page }) => {
   await expect(page.getByLabel('Create a post')).toBeVisible()
   await expect(page.getByText('Bean would like the record')).toBeVisible()
 })
+
+test('can reply to a feed post', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByLabel('Reply to River').fill('Bean is cheering from Portland.')
+  await page.getByRole('button', { name: /^Reply$/ }).first().click()
+
+  await expect(page.getByText('Bean is cheering from Portland.')).toBeVisible()
+})
