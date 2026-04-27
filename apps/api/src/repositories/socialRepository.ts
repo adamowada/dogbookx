@@ -1,16 +1,16 @@
 import { nanoid } from 'nanoid'
-import type { CreatePostInput, DogProfile, Group, Notification, Post, User } from '@dogbookx/types'
-import { dogs, groups, notifications, posts, users } from '../seed.js'
+import type { CreatePostInput, DogbookxData, Post } from '@dogbookx/types'
+import { defaultDataFile, loadDataFile, saveDataFile } from './dataFile.js'
 
 export type SocialRepository = ReturnType<typeof createSocialRepository>
+type RepositoryOptions = { dataFile?: string; initialData?: DogbookxData }
 
-export function createSocialRepository(initial = { users, dogs, posts, groups, notifications }) {
-  const state = {
-    users: structuredClone(initial.users) as User[],
-    dogs: structuredClone(initial.dogs) as DogProfile[],
-    posts: structuredClone(initial.posts) as Post[],
-    groups: structuredClone(initial.groups) as Group[],
-    notifications: structuredClone(initial.notifications) as Notification[]
+export function createSocialRepository(options: RepositoryOptions = {}) {
+  const dataFile = options.dataFile ?? defaultDataFile()
+  const state = options.initialData ? structuredClone(options.initialData) : loadDataFile(dataFile)
+
+  function save() {
+    saveDataFile(dataFile, state)
   }
 
   return {
@@ -40,6 +40,7 @@ export function createSocialRepository(initial = { users, dogs, posts, groups, n
       }
 
       state.posts.unshift(post)
+      save()
       return post
     },
     toggleLike: (postId: string) => {
@@ -48,6 +49,7 @@ export function createSocialRepository(initial = { users, dogs, posts, groups, n
 
       post.likedByViewer = !post.likedByViewer
       post.likeCount += post.likedByViewer ? 1 : -1
+      save()
       return post
     },
     toggleRepost: (postId: string) => {
@@ -56,6 +58,7 @@ export function createSocialRepository(initial = { users, dogs, posts, groups, n
 
       post.repostedByViewer = !post.repostedByViewer
       post.repostCount += post.repostedByViewer ? 1 : -1
+      save()
       return post
     },
     toggleFollow: (viewerId: string, targetId: string) => {
@@ -66,6 +69,7 @@ export function createSocialRepository(initial = { users, dogs, posts, groups, n
       viewer.followingIds = viewer.followingIds.includes(targetId)
         ? viewer.followingIds.filter((id) => id !== targetId)
         : [...viewer.followingIds, targetId]
+      save()
       return viewer
     }
   }

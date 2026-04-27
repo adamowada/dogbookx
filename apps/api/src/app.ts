@@ -4,9 +4,13 @@ import { createSocialRepository } from './repositories/socialRepository.js'
 import { createSocialRouter } from './routes/socialRoutes.js'
 import { SocialService } from './services/socialService.js'
 
-export function createApp() {
+type AppOptions = {
+  dataFile?: string
+}
+
+export function createApp(options: AppOptions = {}) {
   const app = express()
-  const repository = createSocialRepository()
+  const repository = createSocialRepository({ dataFile: options.dataFile })
   const service = new SocialService(repository)
 
   app.use(cors({ origin: true }))

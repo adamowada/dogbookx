@@ -1,9 +1,11 @@
 import type { CreatePostInput, EnrichedPost, FeedResponse, User } from '@dogbookx/types'
+import { getViewerId } from './session'
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`/api${path}`, {
     headers: {
       'Content-Type': 'application/json',
+      'x-dogbookx-user-id': getViewerId(),
       ...options?.headers
     },
     ...options
