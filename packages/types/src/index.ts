@@ -36,7 +36,22 @@ export type Post = {
   repostedByViewer: boolean
 }
 
+export type Reply = {
+  id: Id
+  postId: Id
+  authorId: Id
+  dogId?: Id
+  body: string
+  createdAt: string
+}
+
 export type EnrichedPost = Post & {
+  author: User
+  dog?: DogProfile
+  recentReplies: EnrichedReply[]
+}
+
+export type EnrichedReply = Reply & {
   author: User
   dog?: DogProfile
 }
@@ -75,10 +90,33 @@ export type CreatePostInput = {
   mediaUrl?: string
 }
 
+export type CreateDogInput = {
+  ownerId: Id
+  name: string
+  breed: string
+  age: number
+  pronouns: string
+  bio: string
+  avatarUrl?: string
+  favoritePark: string
+}
+
+export type UpdateDogInput = Partial<Omit<CreateDogInput, 'ownerId'>> & {
+  ownerId: Id
+}
+
+export type CreateReplyInput = {
+  postId: Id
+  authorId: Id
+  dogId?: Id
+  body: string
+}
+
 export type DogbookxData = {
   users: User[]
   dogs: DogProfile[]
   posts: Post[]
+  replies: Reply[]
   groups: Group[]
   notifications: Notification[]
 }

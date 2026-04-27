@@ -8,7 +8,7 @@ export function defaultDataFile() {
 }
 
 export function createSeedData(): DogbookxData {
-  return structuredClone({ users, dogs, posts, groups, notifications })
+  return structuredClone({ users, dogs, posts, replies: [], groups, notifications })
 }
 
 export function loadDataFile(dataFile: string): DogbookxData {
@@ -20,7 +20,8 @@ export function loadDataFile(dataFile: string): DogbookxData {
     return seedData
   }
 
-  return JSON.parse(readFileSync(dataFile, 'utf8')) as DogbookxData
+  const parsed = JSON.parse(readFileSync(dataFile, 'utf8')) as Partial<DogbookxData>
+  return { ...createSeedData(), ...parsed, replies: parsed.replies ?? [] }
 }
 
 export function saveDataFile(dataFile: string, data: DogbookxData) {

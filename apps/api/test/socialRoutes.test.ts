@@ -38,4 +38,38 @@ describe('social routes', () => {
     expect(updatedViewer.id).toBe('user-lena')
     expect(updatedViewer.followingIds).toContain('user-ivy')
   })
+
+  it('creates dog profiles and replies for the session viewer', async () => {
+    const baseUrl = await startTestServer()
+
+    const dog = await fetch(`${baseUrl}/dogs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-dogbookx-user-id': 'user-maya'
+      },
+      body: JSON.stringify({
+        name: 'Maple',
+        breed: 'Spaniel mix',
+        age: 4,
+        pronouns: 'she/her',
+        bio: 'Gentle greeter and couch expert.',
+        favoritePark: 'Wallace Park'
+      })
+    }).then((response) => response.json())
+
+    expect(dog.name).toBe('Maple')
+
+    const reply = await fetch(`${baseUrl}/posts/post-1/replies`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-dogbookx-user-id': 'user-maya'
+      },
+      body: JSON.stringify({ dogId: dog.id, body: 'Maple says excellent work.' })
+    }).then((response) => response.json())
+
+    expect(reply.dog.name).toBe('Maple')
+    expect(reply.body).toBe('Maple says excellent work.')
+  })
 })

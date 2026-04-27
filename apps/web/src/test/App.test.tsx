@@ -43,6 +43,7 @@ describe('App', () => {
               repostCount: 0,
               likedByViewer: false,
               repostedByViewer: false,
+              recentReplies: [],
               author: {
                 id: 'user-maya',
                 handle: 'mayapaws',

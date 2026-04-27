@@ -171,6 +171,66 @@ Data tier:
 
 Use this file for planning meaningful DogbookX features, refactors, or architecture changes.
 
+# Plan: Dog Profiles and Replies MVP Branch
+
+## Goal
+
+Add the remaining core social MVP flows: dog profile management and post replies. A local user should be able to create a dog profile, edit an existing dog, reply to feed posts, and see reply counts update.
+
+## Context
+
+DogbookX treats dog profiles as first-class product concepts, and replies are part of the expected short-post social loop. The durable data branch gives these flows persistence.
+
+## Scope
+
+In scope:
+
+- Create dog profile API and form
+- Update dog profile API and quick-edit controls
+- Reply API, repository persistence, notification generation, and UI composer
+- Shared types and validation schemas
+- Unit, route, UI, and e2e coverage updates
+
+Out of scope:
+
+- Multi-owner dog profiles
+- Thread detail pages
+- Reply deletion and moderation queue UI
+
+## Architecture
+
+Presentation tier:
+
+- Add reusable `DogManager` and inline reply controls.
+- Continue using `@dogbookx/ui` components and Tailwind utilities.
+
+Application tier:
+
+- Extend `SocialService` with dog profile and reply business rules.
+- Keep API routes thin and schema-validated.
+
+Data tier:
+
+- Extend JSON repository state with dog mutation and reply persistence.
+- Maintain backward compatibility for existing `.dogbookx/data.json` files.
+
+## Test plan
+
+- Unit tests for dog ownership and reply counts
+- Route tests for creating dogs and replies as the session viewer
+- UI test for rendered dog management controls
+- E2E test for replying from the feed
+
+## Implementation steps
+
+1. [x] Branch from updated `dev`.
+2. [x] Add plan entry.
+3. [x] Add shared types and validation.
+4. [x] Implement repository/service/routes for dogs and replies.
+5. [x] Add dog profile and reply UI.
+6. [x] Run validation and fix failures.
+7. [ ] Commit, push, PR to `dev`, review, and merge.
+
 Plans should be clear, practical, and easy to execute. Keep them updated as work progresses.
 
 ## When to create a plan
