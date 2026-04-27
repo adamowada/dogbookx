@@ -101,7 +101,181 @@ npm run build
 
 The app is complete for this slice when it installs, runs locally, passes validation, and is merged through the requested GitHub branch workflow.
 
+# Plan: Durable Session Data MVP Branch
+
+## Goal
+
+Move DogbookX from seeded in-memory state to durable local JSON persistence and replace hardcoded viewer usage with a lightweight local session identity. The app should remember created posts, follows, likes, and reposts across API restarts.
+
+## Context
+
+The current MVP is runnable but resets all social activity when the API process restarts. A local MVP needs persistence before profile, comment, and moderation workflows can feel trustworthy.
+
+## Scope
+
+In scope:
+
+- JSON-file data store under `.dogbookx/data.json`
+- Repository save behavior for posts, follows, likes, and reposts
+- Session viewer resolution through `x-dogbookx-user-id`
+- Frontend localStorage session id
+- Tests for persistence and session-driven API behavior
+- Documentation updates
+
+Out of scope:
+
+- Production password authentication
+- Database server or ORM setup
+- Multi-device account sync
+
+## Architecture
+
+Presentation tier:
+
+- `apps/web/src/lib/session.ts` owns the local viewer id.
+- API client attaches the viewer header to each request.
+
+Application tier:
+
+- Routes resolve viewer id from headers and delegate to services.
+- Services continue to own authorization and business rules.
+
+Data tier:
+
+- Repository owns JSON file loading, default seeding, mutation, and saving.
+- Seed data remains the fallback for first local launch.
+
+## Monorepo impact
+
+- `apps/web`: session helper and API client updates
+- `apps/api`: persistent repository and route viewer resolution
+- `packages/types`: optional persisted data shape
+- Other packages: `.gitignore` and README updates
+
+## Test plan
+
+- Unit test repository persistence across instances
+- Unit test service behavior remains intact
+- API smoke test verifies session-aware feed response
+- Existing UI and e2e tests continue to pass
+
+## Implementation steps
+
+1. [x] Branch from `dev`.
+2. [x] Add plan entry.
+3. [x] Add persistent repository tests.
+4. [x] Implement JSON repository persistence.
+5. [x] Add session header support in routes and web API client.
+6. [x] Run validation and fix failures.
+7. [x] Commit, push, PR to `dev`, review, and merge.
+
 Use this file for planning meaningful DogbookX features, refactors, or architecture changes.
+
+# Plan: Dog Profiles and Replies MVP Branch
+
+## Goal
+
+Add the remaining core social MVP flows: dog profile management and post replies. A local user should be able to create a dog profile, edit an existing dog, reply to feed posts, and see reply counts update.
+
+## Context
+
+DogbookX treats dog profiles as first-class product concepts, and replies are part of the expected short-post social loop. The durable data branch gives these flows persistence.
+
+## Scope
+
+In scope:
+
+- Create dog profile API and form
+- Update dog profile API and quick-edit controls
+- Reply API, repository persistence, notification generation, and UI composer
+- Shared types and validation schemas
+- Unit, route, UI, and e2e coverage updates
+
+Out of scope:
+
+- Multi-owner dog profiles
+- Thread detail pages
+- Reply deletion and moderation queue UI
+
+## Architecture
+
+Presentation tier:
+
+- Add reusable `DogManager` and inline reply controls.
+- Continue using `@dogbookx/ui` components and Tailwind utilities.
+
+Application tier:
+
+- Extend `SocialService` with dog profile and reply business rules.
+- Keep API routes thin and schema-validated.
+
+Data tier:
+
+- Extend JSON repository state with dog mutation and reply persistence.
+- Maintain backward compatibility for existing `.dogbookx/data.json` files.
+
+## Test plan
+
+- Unit tests for dog ownership and reply counts
+- Route tests for creating dogs and replies as the session viewer
+- UI test for rendered dog management controls
+- E2E test for replying from the feed
+
+## Implementation steps
+
+1. [x] Branch from updated `dev`.
+2. [x] Add plan entry.
+3. [x] Add shared types and validation.
+4. [x] Implement repository/service/routes for dogs and replies.
+5. [x] Add dog profile and reply UI.
+6. [x] Run validation and fix failures.
+7. [x] Commit, push, PR to `dev`, review, and merge.
+
+# Plan: MVP Release Finalization
+
+## Goal
+
+Promote the integrated DogbookX MVP from `dev` to `main` after verifying the completed local product flow.
+
+## Context
+
+The MVP now includes durable local data, session viewer identity, dog profile management, short posts, replies, likes, reposts, follows, notifications, groups, moderation checks, and a React frontend that can be run locally.
+
+## Scope
+
+In scope:
+
+- Final documentation polish
+- Full validation on integrated `dev`
+- PR from release-finalization branch into `dev`
+- Release PR from `dev` into `main`
+
+Out of scope:
+
+- Production auth
+- Database server migration
+- Hosted deployment
+
+## Test plan
+
+Expected validation commands:
+
+```bash
+npm test
+npm run test:smoke
+npm run test:e2e
+npm run lint
+npm run typecheck
+npm run build
+```
+
+## Implementation steps
+
+1. [x] Mark completed MVP branch plans.
+2. [x] Update README with the final MVP feature set.
+3. [x] Run full validation.
+4. [ ] Commit, push, PR to `dev`, review, and merge.
+5. [ ] Create and merge release PR from `dev` to `main`.
 
 Plans should be clear, practical, and easy to execute. Keep them updated as work progresses.
 

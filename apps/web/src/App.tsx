@@ -70,6 +70,7 @@ export function App() {
           suggestions={feed.suggestions}
           followingIds={followingIds}
           onFollow={followUser}
+          onDogsChange={(dogs) => setFeed((current) => (current ? { ...current, dogs } : current))}
         />
 
         <main className="min-w-0 flex-1 border-x border-zinc-200 bg-white/70">
@@ -93,8 +94,22 @@ export function App() {
               <PostCard
                 key={post.id}
                 post={post}
+                dogs={feed.dogs}
                 onLike={(postId) => void refreshPost(postId, 'like')}
                 onRepost={(postId) => void refreshPost(postId, 'repost')}
+                onReply={(postId, reply) =>
+                  setPosts((current) =>
+                    current.map((post) =>
+                      post.id === postId
+                        ? {
+                            ...post,
+                            replyCount: post.replyCount + 1,
+                            recentReplies: [...post.recentReplies.slice(-1), reply]
+                          }
+                        : post
+                    )
+                  )
+                }
               />
             ))}
           </section>

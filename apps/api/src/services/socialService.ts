@@ -1,4 +1,4 @@
-import type { CreatePostInput, EnrichedPost, FeedResponse } from '@dogbookx/types'
+import type { CreateDogInput, CreatePostInput, CreateReplyInput, EnrichedPost, EnrichedReply, FeedResponse, Reply, UpdateDogInput } from '@dogbookx/types'
 import type { SocialRepository } from '../repositories/socialRepository.js'
 
 const blockedTerms = ['scam', 'abuse', 'hate']
@@ -41,6 +41,31 @@ export class SocialService {
     return this.enrichPost(this.repository.createPost(input))
   }
 
+  createDog(input: CreateDogInput) {
+    this.requireUser(input.ownerId)
+    return this.repository.createDog(input)
+  }
+
+  updateDog(dogId: string, input: UpdateDogInput) {
+    this.requireUser(input.ownerId)
+    const dog = this.repository.updateDog(dogId, input)
+    if (!dog) throw new ServiceError(404, 'Dog profile not found for this user.')
+    return dog
+  }
+
+  createReply(input: CreateReplyInput): EnrichedReply {
+    this.requireUser(input.authorId)
+    if (input.dogId) this.requireOwnedDog(input.authorId, input.dogId)
+
+    if (blockedTerms.some((term) => input.body.toLowerCase().includes(term))) {
+      throw new ServiceError(422, 'This reply needs a quick rewrite before it can be shared.')
+    }
+
+    const reply = this.repository.createReply(input)
+    if (!reply) throw new ServiceError(404, 'Post not found.')
+    return this.enrichReply(reply)
+  }
+
   toggleLike(postId: string): EnrichedPost {
     const post = this.repository.toggleLike(postId)
     if (!post) throw new ServiceError(404, 'Post not found.')
@@ -63,7 +88,30 @@ export class SocialService {
     const author = this.requireUser(post.authorId)
     const dog = post.dogId ? this.repository.findDog(post.dogId) : undefined
 
-    return { ...post, author, dog }
+    return {
+      ...post,
+      author,
+      dog,
+      recentReplies: this.repository
+        .listRepliesForPost(post.id)
+        .slice(-2)
+        .map((reply) => this.enrichReply(reply))
+    }
+  }
+
+  private enrichReply(reply: Reply): EnrichedReply {
+    const author = this.requireUser(reply.authorId)
+    const dog = reply.dogId ? this.repository.findDog(reply.dogId) : undefined
+
+    return { ...reply, author, dog }
+  }
+
+  private requireOwnedDog(ownerId: string, dogId: string) {
+    const dog = this.repository.findDog(dogId)
+    if (!dog || dog.ownerId !== ownerId) {
+      throw new ServiceError(403, 'You can only use one of your own dog profiles.')
+    }
+    return dog
   }
 
   private requireUser(userId: string) {

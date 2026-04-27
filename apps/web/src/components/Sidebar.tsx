@@ -1,6 +1,7 @@
 import { Bell, Dog, Home, Search, ShieldCheck, Users } from 'lucide-react'
 import type { DogProfile, Group, Notification, User } from '@dogbookx/types'
 import { Avatar, Badge, Button } from '@dogbookx/ui'
+import { DogManager } from './DogManager'
 
 type Props = {
   viewer: User
@@ -10,6 +11,7 @@ type Props = {
   suggestions: User[]
   followingIds: string[]
   onFollow: (userId: string) => void
+  onDogsChange: (dogs: DogProfile[]) => void
 }
 
 const navItems = [
@@ -20,7 +22,7 @@ const navItems = [
   { label: 'Safety', icon: ShieldCheck }
 ]
 
-export function Sidebar({ viewer, dogs, groups, notifications, suggestions, followingIds, onFollow }: Props) {
+export function Sidebar({ viewer, dogs, groups, notifications, suggestions, followingIds, onFollow, onDogsChange }: Props) {
   return (
     <aside className="hidden w-80 shrink-0 border-r border-zinc-200 bg-white px-5 py-6 lg:block">
       <div className="flex items-center gap-3">
@@ -51,20 +53,7 @@ export function Sidebar({ viewer, dogs, groups, notifications, suggestions, foll
         <p className="mt-3 text-sm leading-5 text-zinc-600">{viewer.bio}</p>
       </section>
 
-      <section className="mt-6">
-        <h2 className="text-sm font-bold text-zinc-950">Your dogs</h2>
-        <div className="mt-3 space-y-3">
-          {dogs.map((dog) => (
-            <div key={dog.id} className="flex items-center gap-3">
-              <Avatar src={dog.avatarUrl} alt={dog.name} className="size-9" />
-              <div>
-                <p className="text-sm font-semibold text-zinc-900">{dog.name}</p>
-                <p className="text-xs text-zinc-500">{dog.breed} · {dog.age}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <DogManager dogs={dogs} onDogsChange={onDogsChange} />
 
       <section className="mt-6">
         <div className="flex items-center gap-2">
