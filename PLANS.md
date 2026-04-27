@@ -1,5 +1,106 @@
 # PLANS.md
 
+# Plan: Full Local DogbookX MVP
+
+## Goal
+
+Build DogbookX into a runnable local social media MVP for dog owners with a React frontend, Express API, shared packages, test coverage, and a clear path toward database-backed persistence.
+
+## Context
+
+The repository started as a lightweight shell with documentation and reusable React/Tailwind components. This plan turns it into a monorepo that can be installed, tested, and run locally.
+
+## Scope
+
+In scope:
+
+- npm workspace monorepo
+- React home feed with composer, posts, reactions, follows, dog identity, notifications, groups, and moderation cues
+- Express API with thin routes
+- Service layer for feed, posting, follows, likes, reposts, and simple moderation
+- Repository/data-access layer with deterministic local seed data
+- Shared TypeScript types
+- Unit, smoke, integration-style component, and Playwright end-to-end tests
+- README run instructions
+
+Out of scope:
+
+- Production authentication
+- Durable database migrations
+- Uploaded media storage
+- Real-time WebSocket delivery
+- GitHub Actions CI setup
+
+## Architecture
+
+Presentation tier:
+
+- `apps/web` renders the social product experience.
+- `@dogbookx/ui` exposes the existing reusable React/Tailwind components.
+- Web components call the API through `apps/web/src/lib/api.ts`.
+
+Application tier:
+
+- `apps/api/src/routes` owns HTTP routing and request validation.
+- `apps/api/src/services` owns business rules and moderation checks.
+- Routes remain thin and delegate to `SocialService`.
+
+Data tier:
+
+- `apps/api/src/repositories` owns persistence operations.
+- `apps/api/src/seed.ts` provides local seed data until a database is introduced.
+
+## Monorepo impact
+
+- `apps/web`: new Vite React app
+- `apps/api`: new Express API
+- `packages/ui`: moved existing reusable components into a package
+- `packages/types`: new shared social-domain types
+- Other packages: root npm workspace, lint, typecheck, and test config
+
+## Test plan
+
+Write or update tests for:
+
+- Service feed enrichment, moderation, ownership checks, and post creation
+- UI rendering of the loaded feed
+- Shared UI button accessibility
+- API health/feed smoke test
+- End-to-end feed and composer visibility
+
+Expected validation commands:
+
+```bash
+npm test
+npm run test:smoke
+npm run test:e2e
+npm run lint
+npm run typecheck
+npm run build
+```
+
+## Implementation steps
+
+1. [x] Create `dev` and feature branch structure.
+2. [x] Scaffold npm workspace packages and apps.
+3. [x] Move existing UI components into `packages/ui`.
+4. [x] Add shared social-domain types.
+5. [x] Add API seed data, repository, service, validation, and routes.
+6. [x] Build the React frontend using shared UI components.
+7. [x] Add smoke, unit, component, and e2e test coverage.
+8. [x] Run validation and fix failures.
+9. [ ] Commit, push, create PR, review, and merge after checks pass.
+
+## Risks and tradeoffs
+
+- The first data tier uses in-memory seed data so local development is instant; durable database persistence should be the next feature branch.
+- Authentication is represented by a seeded viewer. Production auth and authorization hardening should be added before real user data.
+- Real-time behavior is modeled through API state updates, not WebSockets yet.
+
+## Definition of done
+
+The app is complete for this slice when it installs, runs locally, passes validation, and is merged through the requested GitHub branch workflow.
+
 Use this file for planning meaningful DogbookX features, refactors, or architecture changes.
 
 Plans should be clear, practical, and easy to execute. Keep them updated as work progresses.
