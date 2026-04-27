@@ -101,6 +101,74 @@ npm run build
 
 The app is complete for this slice when it installs, runs locally, passes validation, and is merged through the requested GitHub branch workflow.
 
+# Plan: Durable Session Data MVP Branch
+
+## Goal
+
+Move DogbookX from seeded in-memory state to durable local JSON persistence and replace hardcoded viewer usage with a lightweight local session identity. The app should remember created posts, follows, likes, and reposts across API restarts.
+
+## Context
+
+The current MVP is runnable but resets all social activity when the API process restarts. A local MVP needs persistence before profile, comment, and moderation workflows can feel trustworthy.
+
+## Scope
+
+In scope:
+
+- JSON-file data store under `.dogbookx/data.json`
+- Repository save behavior for posts, follows, likes, and reposts
+- Session viewer resolution through `x-dogbookx-user-id`
+- Frontend localStorage session id
+- Tests for persistence and session-driven API behavior
+- Documentation updates
+
+Out of scope:
+
+- Production password authentication
+- Database server or ORM setup
+- Multi-device account sync
+
+## Architecture
+
+Presentation tier:
+
+- `apps/web/src/lib/session.ts` owns the local viewer id.
+- API client attaches the viewer header to each request.
+
+Application tier:
+
+- Routes resolve viewer id from headers and delegate to services.
+- Services continue to own authorization and business rules.
+
+Data tier:
+
+- Repository owns JSON file loading, default seeding, mutation, and saving.
+- Seed data remains the fallback for first local launch.
+
+## Monorepo impact
+
+- `apps/web`: session helper and API client updates
+- `apps/api`: persistent repository and route viewer resolution
+- `packages/types`: optional persisted data shape
+- Other packages: `.gitignore` and README updates
+
+## Test plan
+
+- Unit test repository persistence across instances
+- Unit test service behavior remains intact
+- API smoke test verifies session-aware feed response
+- Existing UI and e2e tests continue to pass
+
+## Implementation steps
+
+1. [x] Branch from `dev`.
+2. [x] Add plan entry.
+3. [x] Add persistent repository tests.
+4. [x] Implement JSON repository persistence.
+5. [x] Add session header support in routes and web API client.
+6. [x] Run validation and fix failures.
+7. [ ] Commit, push, PR to `dev`, review, and merge.
+
 Use this file for planning meaningful DogbookX features, refactors, or architecture changes.
 
 Plans should be clear, practical, and easy to execute. Keep them updated as work progresses.

@@ -5,13 +5,18 @@ import { viewerId } from '../seed.js'
 
 export function createSocialRouter(service: SocialService) {
   const router = Router()
+  const resolveViewerId = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value) ?? viewerId
 
   router.get('/health', (_request, response) => {
     response.json({ ok: true, service: 'dogbookx-api' })
   })
 
-  router.get('/feed', (_request, response) => {
-    response.json(service.getHomeFeed(viewerId))
+  router.get('/feed', (request, response, next) => {
+    try {
+      response.json(service.getHomeFeed(resolveViewerId(request.headers['x-dogbookx-user-id'])))
+    } catch (error) {
+      next(error)
+    }
   })
 
   router.post('/posts', (request, response, next) => {
@@ -22,7 +27,9 @@ export function createSocialRouter(service: SocialService) {
     }
 
     try {
-      response.status(201).json(service.createPost(parsed.data))
+      response
+        .status(201)
+        .json(service.createPost({ ...parsed.data, authorId: resolveViewerId(request.headers['x-dogbookx-user-id']) }))
     } catch (error) {
       next(error)
     }
@@ -46,7 +53,7 @@ export function createSocialRouter(service: SocialService) {
 
   router.post('/users/:targetId/follow', (request, response, next) => {
     try {
-      response.json(service.toggleFollow(viewerId, request.params.targetId))
+      response.json(service.toggleFollow(resolveViewerId(request.headers['x-dogbookx-user-id']), request.params.targetId))
     } catch (error) {
       next(error)
     }

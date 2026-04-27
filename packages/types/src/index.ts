@@ -74,3 +74,11 @@ export type CreatePostInput = {
   body: string
   mediaUrl?: string
 }
+
+export type DogbookxData = {
+  users: User[]
+  dogs: DogProfile[]
+  posts: Post[]
+  groups: Group[]
+  notifications: Notification[]
+}
